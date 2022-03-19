@@ -36,16 +36,33 @@ async function run() {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
             const user = await usersCollections.findOne(query);
-            console.log('load user with id', id);
+            // console.log('load user with id', id);
             res.send(user);
+        });
+        //  PUT API
+        app.put('/users/:id', async (req, res) => {
+            const id = req.params.id;
+            const updatedUser = req.body;
+            const filter = { _id: ObjectId(id) }
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: {
+                    name: updatedUser.name,
+                    email: updatedUser.email
+                },
+            };
+            const result = await usersCollections.updateOne(filter, updateDoc, options);
+
+            console.log(result);
+            res.json(result);
         })
 
         // POST API
         app.post('/users', async (req, res) => {
             const newUser = req.body;
             const result = await usersCollections.insertOne(newUser)
-            console.log('got new user', req.body);
-            console.log('added user', result);
+            // console.log('got new user', req.body);
+            // console.log('added user', result);
             res.json(result);
         });
         // DELETE API
@@ -53,7 +70,7 @@ async function run() {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
             const result = await usersCollections.deleteOne(query);
-            console.log('delete in user with id', result);
+            // console.log('delete in user with id', result);
             res.json(result);
         })
     } finally {
